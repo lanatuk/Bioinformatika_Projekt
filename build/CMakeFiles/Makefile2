@@ -79,6 +79,7 @@ clean: src/clean
 
 # Recursive "all" directory target.
 src/all: src/CMakeFiles/graphContigs.dir/all
+src/all: src/CMakeFiles/Node.dir/all
 .PHONY : src/all
 
 # Recursive "preinstall" directory target.
@@ -87,21 +88,22 @@ src/preinstall:
 
 # Recursive "clean" directory target.
 src/clean: src/CMakeFiles/graphContigs.dir/clean
+src/clean: src/CMakeFiles/Node.dir/clean
 .PHONY : src/clean
 
 #=============================================================================
 # Target rules for target src/CMakeFiles/graphContigs.dir
 
 # All Build rule for target.
-src/CMakeFiles/graphContigs.dir/all:
+src/CMakeFiles/graphContigs.dir/all: src/CMakeFiles/Node.dir/all
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/graphContigs.dir/build.make src/CMakeFiles/graphContigs.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/graphContigs.dir/build.make src/CMakeFiles/graphContigs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles --progress-num=1,2 "Built target graphContigs"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles --progress-num=3,4 "Built target graphContigs"
 .PHONY : src/CMakeFiles/graphContigs.dir/all
 
 # Build rule for subdir invocation for target.
 src/CMakeFiles/graphContigs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/graphContigs.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles 0
 .PHONY : src/CMakeFiles/graphContigs.dir/rule
@@ -114,6 +116,32 @@ graphContigs: src/CMakeFiles/graphContigs.dir/rule
 src/CMakeFiles/graphContigs.dir/clean:
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/graphContigs.dir/build.make src/CMakeFiles/graphContigs.dir/clean
 .PHONY : src/CMakeFiles/graphContigs.dir/clean
+
+#=============================================================================
+# Target rules for target src/CMakeFiles/Node.dir
+
+# All Build rule for target.
+src/CMakeFiles/Node.dir/all:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/Node.dir/build.make src/CMakeFiles/Node.dir/depend
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/Node.dir/build.make src/CMakeFiles/Node.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles --progress-num=1,2 "Built target Node"
+.PHONY : src/CMakeFiles/Node.dir/all
+
+# Build rule for subdir invocation for target.
+src/CMakeFiles/Node.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/Node.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles 0
+.PHONY : src/CMakeFiles/Node.dir/rule
+
+# Convenience name for target.
+Node: src/CMakeFiles/Node.dir/rule
+.PHONY : Node
+
+# clean rule for target.
+src/CMakeFiles/Node.dir/clean:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/Node.dir/build.make src/CMakeFiles/Node.dir/clean
+.PHONY : src/CMakeFiles/Node.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

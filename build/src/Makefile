@@ -130,6 +130,44 @@ graphContigs/fast:
 	cd /Users/Lana/Desktop/Bioinformatika_Projekt/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/graphContigs.dir/build.make src/CMakeFiles/graphContigs.dir/build
 .PHONY : graphContigs/fast
 
+# Convenience name for target.
+src/CMakeFiles/Node.dir/rule:
+	cd /Users/Lana/Desktop/Bioinformatika_Projekt/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/Node.dir/rule
+.PHONY : src/CMakeFiles/Node.dir/rule
+
+# Convenience name for target.
+Node: src/CMakeFiles/Node.dir/rule
+.PHONY : Node
+
+# fast build rule for target.
+Node/fast:
+	cd /Users/Lana/Desktop/Bioinformatika_Projekt/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/Node.dir/build.make src/CMakeFiles/Node.dir/build
+.PHONY : Node/fast
+
+Node.o: Node.cpp.o
+.PHONY : Node.o
+
+# target to build an object file
+Node.cpp.o:
+	cd /Users/Lana/Desktop/Bioinformatika_Projekt/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/Node.dir/build.make src/CMakeFiles/Node.dir/Node.cpp.o
+.PHONY : Node.cpp.o
+
+Node.i: Node.cpp.i
+.PHONY : Node.i
+
+# target to preprocess a source file
+Node.cpp.i:
+	cd /Users/Lana/Desktop/Bioinformatika_Projekt/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/Node.dir/build.make src/CMakeFiles/Node.dir/Node.cpp.i
+.PHONY : Node.cpp.i
+
+Node.s: Node.cpp.s
+.PHONY : Node.s
+
+# target to generate assembly for a file
+Node.cpp.s:
+	cd /Users/Lana/Desktop/Bioinformatika_Projekt/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/Node.dir/build.make src/CMakeFiles/Node.dir/Node.cpp.s
+.PHONY : Node.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -162,7 +200,11 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... Node"
 	@echo "... graphContigs"
+	@echo "... Node.o"
+	@echo "... Node.i"
+	@echo "... Node.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

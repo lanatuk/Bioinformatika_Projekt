@@ -1,5 +1,6 @@
 /Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles/edit_cache.dir
 /Users/Lana/Desktop/Bioinformatika_Projekt/build/CMakeFiles/rebuild_cache.dir
 /Users/Lana/Desktop/Bioinformatika_Projekt/build/src/CMakeFiles/graphContigs.dir
+/Users/Lana/Desktop/Bioinformatika_Projekt/build/src/CMakeFiles/Node.dir
 /Users/Lana/Desktop/Bioinformatika_Projekt/build/src/CMakeFiles/edit_cache.dir
 /Users/Lana/Desktop/Bioinformatika_Projekt/build/src/CMakeFiles/rebuild_cache.dir

@@ -129,6 +129,19 @@ graphContigs/fast:
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/graphContigs.dir/build.make src/CMakeFiles/graphContigs.dir/build
 .PHONY : graphContigs/fast
 
+#=============================================================================
+# Target rules for targets named Node
+
+# Build rule for target.
+Node: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Node
+.PHONY : Node
+
+# fast build rule for target.
+Node/fast:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/Node.dir/build.make src/CMakeFiles/Node.dir/build
+.PHONY : Node/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -137,6 +150,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... Node"
 	@echo "... graphContigs"
 .PHONY : help
 
