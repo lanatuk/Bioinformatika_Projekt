@@ -1,4 +1,5 @@
 #include "Node.hpp"
+#include <tuple>
 using namespace std;
 
 Node::Node(const string& identifier, bool isAnchoringNode) {
@@ -7,7 +8,7 @@ Node::Node(const string& identifier, bool isAnchoringNode) {
 }
 
 void Node::addChild(Node* child, int overlapScore) {
-	children.push_back(std::make_pair(child, overlapScore));
+	children.push_back(make_tuple(child, overlapScore));
 	//children.emplace_back(child, overlapScore);  //moguci error zbog vector, pair
 }
 void Node::deleteChild(int index) {

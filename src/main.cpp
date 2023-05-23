@@ -2,12 +2,13 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <algorithm>
 #include "Node.hpp"
 
 using namespace std;
 
-bool comparePairs(const pair<Node*, int>& a, const pair<Node*, int>& b) {
-	return a.second > b.second;
+bool comparePairs(const tuple<Node*, int>& a, const tuple<Node*, int>& b) {
+	return get<1>(a) > get<1>(b);
 }
 
 /*
@@ -53,30 +54,32 @@ vector <vector<Node*> > constructPaths(Node* node) {
 }
 */
 
+
+
 //without recursion
 vector<vector<Node*> > constructPaths(Node* startNode) {
-    std::vector<std::vector<Node*> > paths;
-    std::vector<Node*> currentPath;
+    vector<vector<Node*> > paths;
+    vector<Node*> currentPath;
     currentPath.push_back(startNode);
 
     while (!currentPath.empty()) {
         Node* currentNode = currentPath.back();
-        const std::vector<std::pair<Node*, int> >& children = currentNode->children;
+        const vector<tuple<Node*, int> >& children = currentNode->children;
 
         if (children.empty()) {
             paths.push_back(currentPath);
             currentPath.pop_back();
 			if(!currentPath.empty()){
 				Node* oldCurrentNode = currentPath.back();
-        		const std::vector<std::pair<Node*, int> >& oldChildren = oldCurrentNode->children;
-				std::vector<std::pair<Node*, int> > oldSortedChildren(oldChildren);
-            	std::sort(oldSortedChildren.begin(), oldSortedChildren.end(), comparePairs);
+        		const vector<tuple<Node*, int> >& oldChildren = oldCurrentNode->children;
+				vector<tuple<Node*, int> > oldSortedChildren(oldChildren);
+            	sort(oldSortedChildren.begin(), oldSortedChildren.end(), comparePairs);
 				if (!oldSortedChildren.empty()) {
-					Node* bestChildE = oldSortedChildren[0].first;
+					Node* bestChildE = get<0>(oldSortedChildren[0]);
             		
 					int index = -1;
             		for (int i = 0; i < oldChildren.size(); ++i) {
-						if (oldChildren[i].first == bestChildE) {
+						if (get<0>(oldChildren[i]) == bestChildE) {
 							index = i;
 							break;
 						}
@@ -96,13 +99,13 @@ vector<vector<Node*> > constructPaths(Node* startNode) {
 			}
 
         } else {
-            std::vector<std::pair<Node*, int> > sortedChildren(children);
-            std::sort(sortedChildren.begin(), sortedChildren.end(), comparePairs);
+            vector<tuple<Node*, int> > sortedChildren(children);
+            sort(sortedChildren.begin(), sortedChildren.end(), comparePairs);
 				
-			Node* bestChild = sortedChildren[0].first; // Initialize with the first child
+			Node* bestChild = get<0>(sortedChildren[0]); // Initialize with the first child
 
 			while (!sortedChildren.empty()) {
-				bestChild = sortedChildren[0].first;
+				bestChild = get<0>(sortedChildren[0]);
 				// Check if the best child is already in the current path
 				bool childExistsInPath = false;
 				for (Node* node : currentPath) {
@@ -152,10 +155,130 @@ vector<vector<Node*> > constructPaths(Node* startNode) {
     return paths;
 }
 
-int main(){
+//Read PAF file
+vector<tuple<string, string, int, string, string>> readPAF(const string& filePath) {
+    vector<tuple<string, string, int, string, string>> overlaps;
+    ifstream file(filePath);
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string field;
+        vector<string> fields;
+        while (getline(ss, field, '\t')) {
+            fields.push_back(field);
+        }
+        string queryId = fields[0];
+        string targetId = fields[5];
+        int overlapScore = stoi(fields[10]);
+		string sign = fields[4];
+		
+		int queryStart = stoi(fields[2]);
+		
+		int targetStart = stoi(fields[7]);
+		
+		string direction;
+		//check overlaps: right or left		
+		if(sign == "+") {
+			if(queryStart <= targetStart) {
+				direction = "left";
+			} else {
+				direction = "right";
+			}
+		} else if (sign == "-") {
+			//dodati za reverzni komplement
+			//samo znak >= za reverzni
+		}
+		
+        overlaps.emplace_back(queryId, targetId, overlapScore, sign, direction);
+    }
+    return overlaps;
+}
+
+int main(int argc, char* argv[]){
 	
+	string fileContigs;
+	string fileReads;
+	
+	if (argc > 2) {
+		fileContigs = argv[1];
+		fileReads = argv[2];
+	} else {
+		cout << "Number of file paths is not right!" << endl;
+		exit(1);
+	}	
+	
+	
+	vector<tuple<string, string, int, string, string>> contigReadOverlaps = readPAF(fileContigs);
+	vector<tuple<string, string, int, string, string>> readReadOverlaps = readPAF(fileReads);
+		
 	unordered_map<string, Node*> nodes;
 	
+
+	cout << "before contig-read" << endl;
+	//Going over contig-read overlaps
+	for (const auto& overlap : contigReadOverlaps) {
+        string queryId = get<0>(overlap);
+        string targetId = get<1>(overlap);
+        int overlapScore = get<2>(overlap);
+        string sign = get<3>(overlap);
+		string direction = get<4>(overlap);
+
+		//Set nodes
+		//dodati i za komplementarne cvorove jos 2 cvora
+        if (nodes.find(queryId) == nodes.end()) {
+            nodes[queryId] = new Node(queryId, false);
+        }
+        if (nodes.find(targetId) == nodes.end()) {
+            nodes[targetId] = new Node(targetId, true);
+        }
+
+        //Add child based on sign and direction
+		if (sign == "+") {
+			if (direction == "left") {
+				nodes[targetId]->addChild(nodes[queryId], overlapScore);
+			} else {
+				nodes[queryId]->addChild(nodes[targetId], overlapScore);
+			}
+		}
+        //dodati za reverzni komplement
+		
+		
+    }
+	
+	cout << "before read-read" << endl;
+	//Going over read-read overlaps
+	for (const auto& overlap : readReadOverlaps) {
+        string queryId = get<0>(overlap);
+        string targetId = get<1>(overlap);
+        int overlapScore = get<2>(overlap);
+        string sign = get<3>(overlap);
+		string direction = get<4>(overlap);
+		
+		//Set nodes
+		//dodati i za komplementarne cvorove jos 2 cvora
+        if (nodes.find(queryId) == nodes.end()) {
+            nodes[queryId] = new Node(queryId, false);
+        }
+        if (nodes.find(targetId) == nodes.end()) {
+            nodes[targetId] = new Node(targetId, false);
+        }
+
+        //Add child
+        //Add child based on sign and direction
+		if (sign == "+") {
+			if (direction == "left") {
+				nodes[targetId]->addChild(nodes[queryId], overlapScore);
+			} else {
+				nodes[queryId]->addChild(nodes[targetId], overlapScore);
+			}
+		}
+		//dodati za reverzni komplement
+		
+		
+    }
+	
+	
+	/*
 	nodes["ctg1"] = new Node("ctg1", true);
 	nodes["read1"] = new Node("read1", false);
 	nodes["read2"] = new Node("read2", false);
@@ -175,8 +298,9 @@ int main(){
 	
 	//nodes["ctg2"]->addChild(nodes["read1"], 6);
 	//nodes["ctg2"]->addChild(nodes["read3"], 8);
+	*/
 	
-	
+	cout << "before paths" << endl;
 	vector<vector<Node*> > paths;
 	
 	for (const auto& node : nodes) {
