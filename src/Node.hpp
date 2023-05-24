@@ -13,5 +13,5 @@ class Node {
 		
 		string identifier;
 		bool isAnchoringNode;
-		vector<tuple<Node*, int>> children;
+		vector<tuple<Node*, int> > children;
 };

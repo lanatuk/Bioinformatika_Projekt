@@ -156,8 +156,8 @@ vector<vector<Node*> > constructPaths(Node* startNode) {
 }
 
 //Read PAF file
-vector<tuple<string, string, int, string, string>> readPAF(const string& filePath) {
-    vector<tuple<string, string, int, string, string>> overlaps;
+vector<tuple<string, string, int, string, string> > readPAF(const string& filePath) {
+    vector<tuple<string, string, int, string, string> > overlaps;
     ifstream file(filePath);
     string line;
     while (getline(file, line)) {
@@ -172,21 +172,41 @@ vector<tuple<string, string, int, string, string>> readPAF(const string& filePat
         int overlapScore = stoi(fields[10]);
 		string sign = fields[4];
 		
+		int queryLenght = stoi(fields[1]);
 		int queryStart = stoi(fields[2]);
+		int queryEnd = stoi(fields[3]);
 		
+		int targetLenght = stoi(fields[6]);
 		int targetStart = stoi(fields[7]);
+		int targetEnd = stoi(fields[8]);
 		
 		string direction;
 		//check overlaps: right or left		
 		if(sign == "+") {
+			if(targetStart < (targetLenght-targetEnd)){
+				direction = "left";
+			}else if(targetStart == (targetLenght-targetEnd)){
+				if(queryStart < (queryLenght-queryEnd)){
+					direction = "right";
+				}else{
+					direction = "left";
+				}
+			}else{
+				direction = "right";
+			}
+			/*
 			if(queryStart <= targetStart) {
 				direction = "left";
 			} else {
 				direction = "right";
-			}
+			}*/
 		} else if (sign == "-") {
+			continue;
 			//dodati za reverzni komplement
 			//samo znak >= za reverzni
+		}else if(queryId == targetId){
+			continue;
+
 		}
 		
         overlaps.emplace_back(queryId, targetId, overlapScore, sign, direction);
@@ -208,8 +228,8 @@ int main(int argc, char* argv[]){
 	}	
 	
 	
-	vector<tuple<string, string, int, string, string>> contigReadOverlaps = readPAF(fileContigs);
-	vector<tuple<string, string, int, string, string>> readReadOverlaps = readPAF(fileReads);
+	vector<tuple<string, string, int, string, string> > contigReadOverlaps = readPAF(fileContigs);
+	vector<tuple<string, string, int, string, string> > readReadOverlaps = readPAF(fileReads);
 		
 	unordered_map<string, Node*> nodes;
 	
@@ -234,7 +254,7 @@ int main(int argc, char* argv[]){
 
         //Add child based on sign and direction
 		if (sign == "+") {
-			if (direction == "left") {
+			if (direction == "right") {
 				nodes[targetId]->addChild(nodes[queryId], overlapScore);
 			} else {
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
@@ -266,7 +286,7 @@ int main(int argc, char* argv[]){
         //Add child
         //Add child based on sign and direction
 		if (sign == "+") {
-			if (direction == "left") {
+			if (direction == "right") {
 				nodes[targetId]->addChild(nodes[queryId], overlapScore);
 			} else {
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);

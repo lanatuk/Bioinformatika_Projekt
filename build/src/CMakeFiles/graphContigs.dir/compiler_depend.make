@@ -10,6 +10,7 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/wchar.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/12.0.5/include/stddef.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/12.0.5/include/__stddef_max_align_t.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__nullptr \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/wchar.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/_types.h \
@@ -130,7 +131,6 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/limits \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/iterator \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__functional_base \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__functional_base_03 \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/tuple \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/stdexcept \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__memory/allocator_traits.h \
@@ -170,7 +170,6 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/cassert \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/assert.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/functional \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__functional_03 \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/bit \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__bits \
   /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/cstdio \
@@ -281,6 +280,8 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/_types/_nl_item.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fsfilcnt_t.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fsblkcnt_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fd_isset.h:
@@ -288,6 +289,8 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fd_zero.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fd_clr.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fd_setsize.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fd_def.h:
 
@@ -313,6 +316,14 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/types.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/i386/signal.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/resource.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/bit:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/streambuf:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/machine/_types.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/xlocale/_wchar.h:
@@ -331,9 +342,9 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/system_error:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/iostream:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/cctype:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/iostream:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__mutex_base:
 
@@ -362,14 +373,6 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/machine/limits.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__bits:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/streambuf:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/i386/signal.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/resource.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/bit:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/pthread/sched.h:
 
@@ -426,6 +429,8 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/locale:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__memory/allocator_traits.h:
+
+/Library/Developer/CommandLineTools/usr/lib/clang/12.0.5/include/__stddef_max_align_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/Availability.h:
 
@@ -499,11 +504,9 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/wait.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fd_setsize.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__functional_base_03:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/stdlib.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/stdlib.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__memory/base.h:
 
@@ -545,8 +548,6 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__tuple:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/string.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_posix_availability.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/algorithm:
@@ -578,10 +579,6 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/xlocale/_stdlib.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/xlocale/_stdio.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fsfilcnt_t.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/__functional_03:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_timeval.h:
 
@@ -618,6 +615,12 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 /Library/Developer/CommandLineTools/usr/lib/clang/12.0.5/include/stdarg.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/cstddef:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/ctime:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fd_set.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/_ctermid.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/ios:
 
@@ -663,8 +666,6 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_size_t.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/stdlib.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/_ctype.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_va_list.h:
@@ -699,6 +700,8 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_int8_t.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/string.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/initializer_list:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_u_int.h:
@@ -708,12 +711,6 @@ src/CMakeFiles/graphContigs.dir/main.cpp.o: /Users/Lana/Desktop/Bioinformatika_P
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/time.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/ctime:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_fd_set.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/_ctermid.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/sys/_types/_ino_t.h:
 

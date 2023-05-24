@@ -8,7 +8,7 @@ Node::Node(const string& identifier, bool isAnchoringNode) {
 }
 
 void Node::addChild(Node* child, int overlapScore) {
-	children.push_back(make_tuple(child, overlapScore));
+	children.push_back(std::make_tuple(child, overlapScore));
 	//children.emplace_back(child, overlapScore);  //moguci error zbog vector, pair
 }
 void Node::deleteChild(int index) {
