@@ -67,7 +67,7 @@ vector<vector<Node*> > constructPaths(Node* startNode) {
         const vector<tuple<Node*, int> >& children = currentNode->children;
 
         if (children.empty()) {
-            paths.push_back(currentPath);
+            //paths.push_back(currentPath);
             currentPath.pop_back();
 			if(!currentPath.empty()){
 				Node* oldCurrentNode = currentPath.back();
@@ -144,14 +144,14 @@ vector<vector<Node*> > constructPaths(Node* startNode) {
 			}
 			
 			if (sortedChildren.empty()) {
-				paths.push_back(currentPath);
+				//paths.push_back(currentPath);
 				currentPath.pop_back();
 			} else {
 				currentPath.push_back(bestChild);
             }
         }
     }
-
+	//vector<std::vector<Node*>> empty_result;
     return paths;
 }
 
@@ -179,10 +179,25 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
 		int targetLenght = stoi(fields[6]);
 		int targetStart = stoi(fields[7]);
 		int targetEnd = stoi(fields[8]);
+
+		if(queryId == targetId){
+			continue;
+		}
 		
 		string direction;
+		if(targetStart < (targetLenght-targetEnd)){
+				direction = "left";
+		}else if(targetStart == (targetLenght-targetEnd)){
+			if(queryStart < (queryLenght-queryEnd)){
+					direction = "right";
+			}else{
+				direction = "left";
+			}
+		}else{
+			direction = "right";
+		}
 		//check overlaps: right or left		
-		if(sign == "+") {
+		/*if(sign == "+") {
 			if(targetStart < (targetLenght-targetEnd)){
 				direction = "left";
 			}else if(targetStart == (targetLenght-targetEnd)){
@@ -194,20 +209,18 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
 			}else{
 				direction = "right";
 			}
-			/*
+			
 			if(queryStart <= targetStart) {
 				direction = "left";
 			} else {
 				direction = "right";
-			}*/
+			}
 		} else if (sign == "-") {
-			continue;
+			
+			//continue;
 			//dodati za reverzni komplement
 			//samo znak >= za reverzni
-		}else if(queryId == targetId){
-			continue;
-
-		}
+		}*/
 		
         overlaps.emplace_back(queryId, targetId, overlapScore, sign, direction);
     }
@@ -243,14 +256,25 @@ int main(int argc, char* argv[]){
         string sign = get<3>(overlap);
 		string direction = get<4>(overlap);
 
+		string queryIdR = queryId + "*";
+		string targetIdR = targetId + "*";
+
 		//Set nodes
-		//dodati i za komplementarne cvorove jos 2 cvora
-        if (nodes.find(queryId) == nodes.end()) {
-            nodes[queryId] = new Node(queryId, false);
-        }
-        if (nodes.find(targetId) == nodes.end()) {
-            nodes[targetId] = new Node(targetId, true);
-        }
+		if (nodes.find(queryId) == nodes.end()) {
+			nodes[queryId] = new Node(queryId, false, false);
+		}
+		if (nodes.find(targetId) == nodes.end()) {
+			nodes[targetId] = new Node(targetId, true, false);
+		}
+
+		if (sign == "-"){
+			if (nodes.find(queryIdR) == nodes.end()) {
+				nodes[queryIdR] = new Node(queryIdR, false, true);
+			}
+			if (nodes.find(targetIdR) == nodes.end()) {
+				nodes[targetIdR] = new Node(targetIdR, true, true);
+			}
+		}
 
         //Add child based on sign and direction
 		if (sign == "+") {
@@ -258,6 +282,14 @@ int main(int argc, char* argv[]){
 				nodes[targetId]->addChild(nodes[queryId], overlapScore);
 			} else {
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
+			}
+		}else{
+			if (direction == "right") {
+				nodes[targetId]->addChild(nodes[queryIdR], overlapScore);
+				nodes[queryId]->addChild(nodes[targetIdR], overlapScore);
+			} else {
+				nodes[targetIdR]->addChild(nodes[queryId], overlapScore);
+				nodes[queryIdR]->addChild(nodes[targetId], overlapScore);
 			}
 		}
         //dodati za reverzni komplement
@@ -273,16 +305,27 @@ int main(int argc, char* argv[]){
         int overlapScore = get<2>(overlap);
         string sign = get<3>(overlap);
 		string direction = get<4>(overlap);
-		
-		//Set nodes
-		//dodati i za komplementarne cvorove jos 2 cvora
-        if (nodes.find(queryId) == nodes.end()) {
-            nodes[queryId] = new Node(queryId, false);
-        }
-        if (nodes.find(targetId) == nodes.end()) {
-            nodes[targetId] = new Node(targetId, false);
-        }
 
+		string queryIdR = queryId + "*";
+		string targetIdR = targetId + "*";
+
+		//Set nodes
+		if (nodes.find(queryId) == nodes.end()) {
+			nodes[queryId] = new Node(queryId, false, false);
+		}
+		if (nodes.find(targetId) == nodes.end()) {
+			nodes[targetId] = new Node(targetId, false, false);
+		}
+
+		if (sign == "-"){
+			if (nodes.find(queryIdR) == nodes.end()) {
+				nodes[queryIdR] = new Node(queryIdR, false, true);
+			}
+			if (nodes.find(targetIdR) == nodes.end()) {
+				nodes[targetIdR] = new Node(targetIdR, true, true);
+			}
+		}
+	
         //Add child
         //Add child based on sign and direction
 		if (sign == "+") {
@@ -291,12 +334,20 @@ int main(int argc, char* argv[]){
 			} else {
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
 			}
+		}else{
+			if (direction == "right") {
+				nodes[targetId]->addChild(nodes[queryIdR], overlapScore);
+				nodes[queryId]->addChild(nodes[targetIdR], overlapScore);
+			} else {
+				nodes[targetIdR]->addChild(nodes[queryId], overlapScore);
+				nodes[queryIdR]->addChild(nodes[targetId], overlapScore);
+			}
+
 		}
 		//dodati za reverzni komplement
 		
 		
     }
-	
 	
 	/*
 	nodes["ctg1"] = new Node("ctg1", true);
@@ -327,15 +378,19 @@ int main(int argc, char* argv[]){
 		if(node.second->isAnchoringNode) {
 			//cout << node.first<<endl;
 			vector<vector<Node*> > nodePaths = constructPaths(node.second);
-			paths.insert(paths.end(), nodePaths.begin(), nodePaths.end());
+			if (nodePaths.empty()){
+				continue;
+			}else{
+				paths.insert(paths.end(), nodePaths.begin(), nodePaths.end());
+			}
 		}
 	}
-	
 	
 	//print paths
 	for(const auto& path : paths) {
 		for(const auto& node : path) {
 			cout << node->identifier << " ";
+			//dodati ako je node kompl dodati *
 		}
 		cout << endl;
 	}
