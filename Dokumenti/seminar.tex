@@ -1,0 +1,47 @@
+\documentclass[times, utf8, seminar]{fer}
+\usepackage{booktabs}
+
+\begin{document}
+
+% TODO: Navedite naslov rada.
+\title{Poboljšanje djelomično sastavljenog genoma dugim očitanjima}
+
+% TODO: Navedite vaše ime i prezime.
+\author{Lana Tuković, Ema Vlainić}
+
+% TODO: Navedite ime i prezime mentora.
+\voditelj{Krešimir Križanović}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Uvod}
+Postupak sastavljanja složenih genoma može dati fragmentiran rezultat zbog velikog broja ponavljajućih sekvenci koje otežavaju proces poravnanja. Naš zadatak bio je pokušati međusobno povezati dobivene fragmente - contige u cijeli genom. Algoritam koji smo pri tome koristili zasniva se na konstruiranju grafa preklapanja te pronalaženja optimalnih staza među preklapanjima. Pronađena optimalna staza će nam služiti da povežemo dva contig-a.
+
+\chapter{Opis algoritma}
+Skupovi očitanja i već sastavljenih contig-a pripremljeni su kao testni podaci. Njihova preklapanja dobivena pomoću alata Minimap2 koristimo kao ulazne točke programa.
+
+\underline{Ulazni podaci:}
+\begin{itemize}
+	\item[•]{preklapanja između contig-a i očitanja u PAF formatu dobivena korištenjem alata Minimap2 nad datotekom sa skupom contig-a i datotekom sa skupom očitanja}
+	\item[•]{međusobna preklapanja očitanja u PAF formatu dobivena korištenjem alata Minimap2 nad dvije iste datoteke sa skupom očitanja}
+\end{itemize}
+
+\underline{Izlazni podaci:}
+\begin{itemize}
+	\item[•]{poboljšani skup sastavljenih contiga u FASTA formatu}
+\end{itemize}
+
+\begin{flushleft}
+Sada kada imamo sve potrebne podatke možemo konstruirati graf preklapanja. Graf preklapanja sastoji se od dvije vrste čvorova: usidreni čvorovi (\textit{anchoring nodes}) koji predstavljaju unaprijed sastavljane contig-e i čvorovi očitanja (\textit{read nodes}). Veza između dva čvorova predstavlja preklapanje tih dvaju čvorova. Kada je graf konstruiran, slijedi traženje optimalnih staza iz svakog usidrenog čvora do skupa mogućih završnih usidrenih čvorova.
+\end{flushleft}
+
+
+\chapter{Zaključak}
+Zaključak.
+
+\bibliography{literatura}
+\bibliographystyle{fer}
+
+\end{document}
