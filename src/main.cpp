@@ -4,6 +4,10 @@
 #include <unordered_map>
 #include <algorithm>
 #include "Node.hpp"
+#include <stack>
+#include <unordered_set>
+#include <random>
+#include <set>
 
 using namespace std;
 
@@ -54,10 +58,25 @@ vector <vector<Node*> > constructPaths(Node* node) {
 }
 */
 
+size_t monteCarloSelection(const vector<double>& weights) {
+    //Create a random number generator
+    random_device rd;
+    mt19937 gen(rd());
 
+	
+	//Create a discrete distribution based on the weights
+	discrete_distribution<size_t> distance(weights.begin(), weights.end());
+
+	//Generate a random index based on the weights
+	size_t selectedIndex = distance(gen);
+		
+	return selectedIndex;
+		
+
+}
 
 //without recursion
-vector<vector<Node*> > constructPaths(Node* startNode) {
+vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo) {
     vector<vector<Node*> > paths;
     vector<Node*> currentPath;
     currentPath.push_back(startNode);
@@ -99,12 +118,30 @@ vector<vector<Node*> > constructPaths(Node* startNode) {
 			}
 
         } else {
-            vector<tuple<Node*, int> > sortedChildren(children);
-            sort(sortedChildren.begin(), sortedChildren.end(), comparePairs);
+			vector<tuple<Node*, int>> sortedChildren;
+			
+			if (flagMonteCarlo) {
+				vector<double> weights;
+				for (const auto& child : children) {
+					weights.push_back(get<1>(child));
+				}
+				
+				//set<int> usedIndexes;
+				for (int i = 0; i < children.size(); i++) {
+					size_t selectedIndex = monteCarloSelection(weights);
+					sortedChildren.push_back(children[selectedIndex]);
+					weights.erase(weights.begin() + int(selectedIndex));
+				}
+				
+			} else {
+				sortedChildren = children;
+				sort(sortedChildren.begin(), sortedChildren.end(), comparePairs);
+			}
 				
 			Node* bestChild = get<0>(sortedChildren[0]); // Initialize with the first child
 
 			while (!sortedChildren.empty()) {
+				
 				bestChild = get<0>(sortedChildren[0]);
 				// Check if the best child is already in the current path
 				bool childExistsInPath = false;
@@ -146,6 +183,7 @@ vector<vector<Node*> > constructPaths(Node* startNode) {
 			if (sortedChildren.empty()) {
 				//paths.push_back(currentPath);
 				currentPath.pop_back();
+				
 			} else {
 				currentPath.push_back(bestChild);
             }
@@ -169,7 +207,7 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
         }
         string queryId = fields[0];
         string targetId = fields[5];
-        int overlapScore = stoi(fields[10]);
+        int overlapScore = stoi(fields[9]);
 		string sign = fields[4];
 		
 		int queryLenght = stoi(fields[1]);
@@ -348,18 +386,18 @@ int main(int argc, char* argv[]){
 		
 		
     }
-	
 	/*
-	nodes["ctg1"] = new Node("ctg1", true);
-	nodes["read1"] = new Node("read1", false);
-	nodes["read2"] = new Node("read2", false);
+	
+	nodes["ctg1"] = new Node("ctg1", true, false);
+	nodes["read1"] = new Node("read1", false, false);
+	nodes["read2"] = new Node("read2", false, false);
 	
 	nodes["ctg1"]->addChild(nodes["read1"], 9);
 	nodes["ctg1"]->addChild(nodes["read2"], 8);
 	
-	nodes["ctg2"] = new Node("ctg2", true);
-	nodes["read1"] = new Node("read1", false);
-	nodes["read3"] = new Node("read3", false);
+	nodes["ctg2"] = new Node("ctg2", true, false);
+	nodes["read1"] = new Node("read1", false, false);
+	nodes["read3"] = new Node("read3", false, false);
 
 	nodes["read3"]->addChild(nodes["ctg2"], 5);
 	//nodes["read1"]->addChild(nodes["ctg2"], 7);
@@ -369,15 +407,15 @@ int main(int argc, char* argv[]){
 	
 	//nodes["ctg2"]->addChild(nodes["read1"], 6);
 	//nodes["ctg2"]->addChild(nodes["read3"], 8);
-	*/
 	
+	*/
 	cout << "before paths" << endl;
 	vector<vector<Node*> > paths;
-	
+	bool flagMonteCarlo = 1;
 	for (const auto& node : nodes) {
 		if(node.second->isAnchoringNode) {
 			//cout << node.first<<endl;
-			vector<vector<Node*> > nodePaths = constructPaths(node.second);
+			vector<vector<Node*> > nodePaths = constructPaths(node.second, flagMonteCarlo);
 			if (nodePaths.empty()){
 				continue;
 			}else{
