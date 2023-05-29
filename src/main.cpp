@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <random>
 #include <set>
+#include <unistd.h>
 
 using namespace std;
 
@@ -194,7 +195,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo) {
 }
 
 //Read PAF file
-vector<tuple<string, string, int, string, string> > readPAF(const string& filePath) {
+vector<tuple<string, string, int, string, string> > readPAF(const string& filePath, string scoreType) {
     vector<tuple<string, string, int, string, string> > overlaps;
     ifstream file(filePath);
     string line;
@@ -211,16 +212,16 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
 		//int alignmentLenght = stoi(fields[10]);
 		string sign = fields[4];
 		
-		int queryLenght = stoi(fields[1]);
+		int queryLength = stoi(fields[1]);
 		int queryStart = stoi(fields[2]);
 		int queryEnd = stoi(fields[3]);
 		
-		int targetLenght = stoi(fields[6]);
+		int targetLength = stoi(fields[6]);
 		int targetStart = stoi(fields[7]);
 		int targetEnd = stoi(fields[8]);
 
-		//int overlapScore = alignmentLenght * matches;
 		
+		//int extensionScore = overlapScore + (targetLength-targetEnd)/2 - (targetStart+queryLength-queryEnd)/2;
 
 		if(queryId == targetId){
 			continue;
@@ -228,16 +229,23 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
 		
 		
 		string direction;
-		if(targetStart < (targetLenght-targetEnd)){
+		if(targetStart < (targetLength-targetEnd)){
 				direction = "left";
-		}else if(targetStart == (targetLenght-targetEnd)){
-			if(queryStart < (queryLenght-queryEnd)){
+		}else if(targetStart == (targetLength-targetEnd)){
+			if(queryStart < (queryLength-queryEnd)){
 					direction = "right";
 			}else{
 				direction = "left";
 			}
 		}else{
 			direction = "right";
+		}
+		
+		int extensionScore;
+		if (direction == "right") {
+			extensionScore = overlapScore + (targetLength-targetEnd)/2 - (targetStart+queryLength-queryEnd)/2;
+		} else {
+			extensionScore = overlapScore + (queryLength-queryEnd)/2 - (queryStart+targetLength-targetEnd)/2;
 		}
 		//check overlaps: right or left		
 		/*if(sign == "+") {
@@ -265,31 +273,58 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
 			//samo znak >= za reverzni
 		}*/
 		
-        overlaps.emplace_back(queryId, targetId, overlapScore, sign, direction);
+		int score;
+		if(scoreType == "overlap") {
+			score = overlapScore;
+		} else {
+			score = extensionScore;
+		}
+		
+        overlaps.emplace_back(queryId, targetId, score, sign, direction);
     }
     return overlaps;
 }
 
 int main(int argc, char* argv[]){
 	
+	//deafult values
+	bool flagMonteCarlo = 0;
+	string scoreType = "overlap";
+	
 	string fileContigs;
 	string fileReads;
+	char opts[] = "h:o:e:m";
+
+    int opt;
+	while ((opt = getopt(argc, argv, opts)) != -1){
+        switch (opt){
+	        case 'h':
+			 //help();
+	         break;
+	        case 'o':
+	         scoreType = "overlap";
+	         break;
+			case 'e':
+			 scoreType = "extension";
+			 break;
+			case 'm':
+			 scoreType = "monteCarlo";
+			 break;
+        }
+    }
+
+    fileContigs = argv[optind];
+    fileReads = argv[optind + 1];
 	
-	if (argc > 2) {
-		fileContigs = argv[1];
-		fileReads = argv[2];
-	} else {
-		cout << "Number of file paths is not right!" << endl;
-		exit(1);
-	}	
 	
-	
-	vector<tuple<string, string, int, string, string> > contigReadOverlaps = readPAF(fileContigs);
-	vector<tuple<string, string, int, string, string> > readReadOverlaps = readPAF(fileReads);
+	if (scoreType == "MonteCarlo") {
+		flagMonteCarlo = 1;
+	}
+	vector<tuple<string, string, int, string, string> > contigReadOverlaps = readPAF(fileContigs, scoreType);
+	vector<tuple<string, string, int, string, string> > readReadOverlaps = readPAF(fileReads, scoreType);
 		
 	unordered_map<string, Node*> nodes;
 	
-
 	cout << "before contig-read" << endl;
 	//Going over contig-read overlaps
 	for (const auto& overlap : contigReadOverlaps) {
@@ -416,7 +451,6 @@ int main(int argc, char* argv[]){
 	*/
 	cout << "before paths" << endl;
 	vector<vector<Node*> > paths;
-	bool flagMonteCarlo = 0;
 	for (const auto& node : nodes) {
 		if(node.second->isAnchoringNode) {
 			//cout << node.first<<endl;
