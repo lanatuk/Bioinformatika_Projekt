@@ -207,8 +207,8 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
         }
         string queryId = fields[0];
         string targetId = fields[5];
-        int matches = stoi(fields[9]);
-		int alignmentLenght = stoi(fields[10]);
+        int overlapScore = stoi(fields[9]);
+		//int alignmentLenght = stoi(fields[10]);
 		string sign = fields[4];
 		
 		int queryLenght = stoi(fields[1]);
@@ -219,11 +219,13 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
 		int targetStart = stoi(fields[7]);
 		int targetEnd = stoi(fields[8]);
 
-		int overlapScore = alignmentLenght * matches;
+		//int overlapScore = alignmentLenght * matches;
+		
 
 		if(queryId == targetId){
 			continue;
 		}
+		
 		
 		string direction;
 		if(targetStart < (targetLenght-targetEnd)){
@@ -414,7 +416,7 @@ int main(int argc, char* argv[]){
 	*/
 	cout << "before paths" << endl;
 	vector<vector<Node*> > paths;
-	bool flagMonteCarlo = 1;
+	bool flagMonteCarlo = 0;
 	for (const auto& node : nodes) {
 		if(node.second->isAnchoringNode) {
 			//cout << node.first<<endl;
