@@ -16,48 +16,7 @@ bool comparePairs(const tuple<Node*, int>& a, const tuple<Node*, int>& b) {
 	return get<1>(a) > get<1>(b);
 }
 
-/*
-//with recursion
-vector <vector<Node*> > constructPaths(Node* node) {
-	vector<vector<Node*> > paths;
-	
-	//
-	if(node->children.empty()) {
-		paths.emplace_back(vector<Node*>{node}); //creates new path vector and adds it to the 'paths' vector of vectors
-		//initializes a new vector with single element 'node'
-		return paths;
-		
-	}
-	
-	vector<pair<Node*, int> > sortedChildren = node->children;
-	sort(sortedChildren.begin(), sortedChildren.end(), comparePairs);  //moguci error zbog arg funkcije
-	
-	Node* bestChild = nullptr;
-	for(const auto& child : sortedChildren) {
-		if(!child.first->isAnchoringNode) {
-			bestChild = child.first;
-			break;
-		}
-	}
-	
-	//if it reached anchoring node -> finish
-	if(bestChild == nullptr) {
-		paths.emplace_back(vector<Node*>{node});
-		return paths;
-	}
-	
-	vector<vector<Node*>> childPaths = constructPaths(bestChild);
-	
-	for(auto& path : childPaths) {
-		path.insert(path.begin(), node);
-		// tu neki error javlja
-		//path.push_back(path);
-	}
-	
-	return paths;
-	
-}
-*/
+
 
 size_t monteCarloSelection(const vector<double>& weights) {
     //Create a random number generator
@@ -317,7 +276,7 @@ int main(int argc, char* argv[]){
     fileReads = argv[optind + 1];
 	
 	
-	if (scoreType == "MonteCarlo") {
+	if (scoreType == "monteCarlo") {
 		flagMonteCarlo = 1;
 	}
 	vector<tuple<string, string, int, string, string> > contigReadOverlaps = readPAF(fileContigs, scoreType);
@@ -340,11 +299,13 @@ int main(int argc, char* argv[]){
 		//Set nodes
 		if (nodes.find(queryId) == nodes.end()) {
 			nodes[queryId] = new Node(queryId, false, false);
+			nodes[queryIdR] = new Node(queryIdR, false, true); 
 		}
 		if (nodes.find(targetId) == nodes.end()) {
 			nodes[targetId] = new Node(targetId, true, false);
+			nodes[targetIdR] = new Node(targetIdR, true, true);
 		}
-
+		/*
 		if (sign == "-"){
 			if (nodes.find(queryIdR) == nodes.end()) {
 				nodes[queryIdR] = new Node(queryIdR, false, true);
@@ -352,14 +313,16 @@ int main(int argc, char* argv[]){
 			if (nodes.find(targetIdR) == nodes.end()) {
 				nodes[targetIdR] = new Node(targetIdR, true, true);
 			}
-		}
+		}*/
 
         //Add child based on sign and direction
 		if (sign == "+") {
 			if (direction == "right") {
-				nodes[targetId]->addChild(nodes[queryId], overlapScore);
-			} else {
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
+				nodes[targetIdR]->addChild(nodes[queryIdR], overlapScore);
+			} else {
+				nodes[targetId]->addChild(nodes[queryId], overlapScore);
+				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore);
 			}
 		}else{
 			if (direction == "right") {
@@ -390,27 +353,23 @@ int main(int argc, char* argv[]){
 		//Set nodes
 		if (nodes.find(queryId) == nodes.end()) {
 			nodes[queryId] = new Node(queryId, false, false);
+			nodes[queryIdR] = new Node(queryIdR, false, true); 
 		}
 		if (nodes.find(targetId) == nodes.end()) {
 			nodes[targetId] = new Node(targetId, false, false);
+			nodes[targetIdR] = new Node(targetIdR, false, true);
 		}
 
-		if (sign == "-"){
-			if (nodes.find(queryIdR) == nodes.end()) {
-				nodes[queryIdR] = new Node(queryIdR, false, true);
-			}
-			if (nodes.find(targetIdR) == nodes.end()) {
-				nodes[targetIdR] = new Node(targetIdR, true, true);
-			}
-		}
 	
         //Add child
         //Add child based on sign and direction
 		if (sign == "+") {
 			if (direction == "right") {
-				nodes[targetId]->addChild(nodes[queryId], overlapScore);
-			} else {
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
+				nodes[targetIdR]->addChild(nodes[queryIdR], overlapScore);
+			} else {
+				nodes[targetId]->addChild(nodes[queryId], overlapScore);
+				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore);
 			}
 		}else{
 			if (direction == "right") {
@@ -420,7 +379,6 @@ int main(int argc, char* argv[]){
 				nodes[targetIdR]->addChild(nodes[queryId], overlapScore);
 				nodes[queryIdR]->addChild(nodes[targetId], overlapScore);
 			}
-
 		}
 		//dodati za reverzni komplement
 		
@@ -469,6 +427,7 @@ int main(int argc, char* argv[]){
 			cout << node->identifier << " ";
 			//dodati ako je node kompl dodati *
 		}
+		cout << endl;
 		cout << endl;
 	}
 	
