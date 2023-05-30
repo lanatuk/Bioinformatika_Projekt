@@ -1,5 +1,7 @@
 \documentclass[times, utf8, seminar]{fer}
 \usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
 
 \begin{document}
 
@@ -24,7 +26,7 @@ Skupovi očitanja i već sastavljenih contig-a pripremljeni su kao testni podaci
 
 \underline{Ulazni podaci:}
 \begin{itemize}
-	\item[•]{preklapanja između contig-a i očitanja u PAF formatu dobivena korištenjem alata Minimap2 nad datotekom sa skupom contig-a i datotekom sa skupom očitanja}
+	\item[•]{preklapanja između contig-a i očitanja u PAF formatu dobivena korištenjem alata Minimap2 \cite{minimap2} nad datotekom sa skupom contig-a i datotekom sa skupom očitanja}
 	\item[•]{međusobna preklapanja očitanja u PAF formatu dobivena korištenjem alata Minimap2 nad dvije iste datoteke sa skupom očitanja}
 \end{itemize}
 
@@ -34,7 +36,24 @@ Skupovi očitanja i već sastavljenih contig-a pripremljeni su kao testni podaci
 \end{itemize}
 
 \begin{flushleft}
-Sada kada imamo sve potrebne podatke možemo konstruirati graf preklapanja. Graf preklapanja sastoji se od dvije vrste čvorova: usidreni čvorovi (\textit{anchoring nodes}) koji predstavljaju unaprijed sastavljane contig-e i čvorovi očitanja (\textit{read nodes}). Veza između dva čvorova predstavlja preklapanje tih dvaju čvorova. Kada je graf konstruiran, slijedi traženje optimalnih staza iz svakog usidrenog čvora do skupa mogućih završnih usidrenih čvorova.
+Sada kada imamo sve potrebne podatke možemo konstruirati graf preklapanja. U svom radu \cite{du2021assembly} opisali su postupak kontruiranja grafa preklapanja gdje preklapanja povezuju čvorove grafa. Graf preklapanja sastoji se od dvije vrste čvorova: usidreni čvorovi (\textit{anchoring nodes}) koji predstavljaju unaprijed sastavljane contig-e i čvorovi očitanja (\textit{read nodes}). Veza između dva čvorova predstavlja preklapanje tih dvaju čvorova. Kada je graf konstruiran, slijedi traženje optimalnih staza iz svakog usidrenog čvora do skupa mogućih završnih usidrenih čvorova.
+
+Postupak traženja staza provodi se tako da se iz svakog čvora širi staza prema susjednom čvoru sa najvećim dobitkom. Optimalne staze u grafu tražili smo na tri načina:
+\begin{itemize}
+	\item[•]{staza se proširuje na susjedni čvor koji ima najveći \textit{overlap score} - vrijednost preklapanja}
+	\item[•]{staza se proširuje na susjedni čvor koji ima najveći \textit{extension score} - vrijednost nadovezivanja}
+	\item[•]{staza se proširuje na susjedni čvor koji je slučajno izabran, a vjerovatnost njegovog izabiranja je proporcionalna njegovoj vrijednosti nadovezivanja - \textit{Monte Carlo} metoda}
+
+Na slici \ref{fig:scores} prikazano je kako se računa \textit{overlap score} i \textit{extension score}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{scores.jpg}
+  \caption{Postupak računanja vrijednosti preklapanja i nadovezivanja}
+  \label{fig:scores}
+\end{figure}
+
+\end{itemize}
 \end{flushleft}
 
 
