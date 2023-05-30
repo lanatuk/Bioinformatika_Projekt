@@ -9,6 +9,7 @@
 #include <random>
 #include <set>
 #include <unistd.h>
+#include <map>
 
 using namespace std;
 
@@ -113,7 +114,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 				}
 				
 			}
-			Node* emptyNode = new Node("", false, false);
+			Node* emptyNode = new Node("", false, false, make_tuple(0,0,0));
 			Node* bestChild = emptyNode;
 			if(sortedChildren.size() != 0){
 				bestChild = get<0>(sortedChildren[0]); // Initialize with the first child
@@ -178,8 +179,8 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 }
 
 //Read PAF file
-vector<tuple<string, string, int, string, string> > readPAF(const string& filePath, string scoreType) {
-    vector<tuple<string, string, int, string, string> > overlaps;
+vector<tuple<string, string, int, string, string, tuple<int,int,int>, tuple<int,int,int>> > readPAF(const string& filePath, string scoreType) {
+    vector<tuple<string, string, int, string, string, tuple<int,int,int>, tuple<int,int,int>> > overlaps;
     ifstream file(filePath);
     string line;
     while (getline(file, line)) {
@@ -263,10 +264,135 @@ vector<tuple<string, string, int, string, string> > readPAF(const string& filePa
 			score = extensionScore;
 		}
 		
-        overlaps.emplace_back(queryId, targetId, score, sign, direction);
+		tuple<int,int,int> queryTuple = make_tuple(queryStart, queryEnd, queryLength);
+		tuple<int,int,int> targetTuple = make_tuple(targetStart, targetEnd, targetLength);
+        overlaps.emplace_back(queryId, targetId, score, sign, direction, queryTuple, targetTuple);
     }
     return overlaps;
 }
+
+
+map<string, string> parseFastaToMap(const string& fileContigs) {
+    ifstream inputFile(fileContigs);
+    string line, sequence;
+    map<string, string> sequenceMap;
+    string currentHeader;
+    
+    if (!inputFile.is_open()) {
+        std::cerr << "Failed to open the file." << std::endl;
+        return sequenceMap;
+    }
+    
+    while (getline(inputFile, line)) {
+        if (line.empty()) {
+            continue;  //skip empty lines
+        } else if (line[0] == '>') {
+            if (!sequence.empty()) {
+                //process the previously read sequence
+                sequenceMap[currentHeader] = sequence;
+                sequence.clear();
+            }
+            
+            //process the header line starting with '>'
+            currentHeader = line.substr(1);
+        } else {
+            //append the sequence line to the existing sequence
+            sequence += line;
+        }
+    }
+    
+    //process the last sequence in the file
+    if (!sequence.empty()) {
+        sequenceMap[currentHeader] = sequence;
+    }
+    
+    inputFile.close();
+    
+    return sequenceMap;
+}
+
+string reverseComplement(string sequence) {
+    string complement = "";
+    
+    for (char base : sequence) {
+        switch (base) {
+            case 'A':
+                complement += 'T';
+                break;
+            case 'T':
+                complement += 'A';
+                break;
+            case 'C':
+                complement += 'G';
+                break;
+            case 'G':
+                complement += 'C';
+                break;
+            default:
+                break;
+        }
+    }
+    
+    reverse(complement.begin(), complement.end());
+    return complement;
+}
+
+string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> contigsMap, map<string,string> readsMap) {
+	bool flagFirst = true;
+	string finalSequence;
+	vector<string> usedContigs;
+ 	for (const auto& path : paths) {
+		for (Node* node : path) {
+			string sequence;
+			//remove * from nodeId if reverse complement
+			string nodeId = node->identifier;
+			if (node->isReverse) {
+				nodeId.pop_back();
+			}
+			if(node->isAnchoringNode) {
+				auto it = find(usedContigs.begin(), usedContigs.end(), nodeId);
+
+				if (it != usedContigs.end()) {
+					//if contig already in vector
+					continue;
+				} else {
+					usedContigs.push_back(node->identifier);
+				}
+				sequence = contigsMap[nodeId];
+			} else {
+				sequence = readsMap[nodeId];
+			}
+			
+			int start = get<0>(node->seqTuple);
+			int end = get<1>(node->seqTuple);
+			int length = get<2>(node->seqTuple);
+			
+			if (!node->isReverse) {
+				//first sequence
+				if(flagFirst) {
+					finalSequence = sequence;
+					flagFirst = false;
+				} else {
+					finalSequence += sequence.substr(end, length);
+				}
+			} else {
+				//first sequence
+				if(flagFirst) {
+					finalSequence = reverseComplement(sequence);
+					flagFirst = false;
+				} else {
+					string reversedSequence = reverseComplement(sequence);
+					int new_end = length-1 - start;
+					int new_start = length-1 - end;
+					finalSequence += reversedSequence.substr(new_start, new_end);
+				}
+			}
+		}
+		
+	}
+	return finalSequence;
+}
+
 
 int main(int argc, char* argv[]){
 	
@@ -303,9 +429,9 @@ int main(int argc, char* argv[]){
 	if (scoreType == "monteCarlo") {
 		flagMonteCarlo = 1;
 	}
-	vector<tuple<string, string, int, string, string> > contigReadOverlaps = readPAF(fileContigs, scoreType);
-	vector<tuple<string, string, int, string, string> > readReadOverlaps = readPAF(fileReads, scoreType);
-		
+	vector<tuple<string, string, int, string, string, tuple<int,int,int> , tuple<int,int,int>> > contigReadOverlaps = readPAF(fileContigs, scoreType);
+	vector<tuple<string, string, int, string, string,tuple<int,int,int> , tuple<int,int,int>> > readReadOverlaps = readPAF(fileReads, scoreType);	
+	
 	unordered_map<string, Node*> nodes;
 	vector<Node*> contigs;
 	vector<Node*> contigsReversed;
@@ -318,20 +444,22 @@ int main(int argc, char* argv[]){
         int overlapScore = get<2>(overlap);
         string sign = get<3>(overlap);
 		string direction = get<4>(overlap);
+		tuple<int,int,int> queryTuple = get<5>(overlap);
+		tuple<int,int,int> targetTuple = get<6>(overlap);
 
 		string queryIdR = queryId + "*";
 		string targetIdR = targetId + "*";
 
 		//Set nodes
 		if (nodes.find(queryId) == nodes.end()) {
-			nodes[queryId] = new Node(queryId, false, false);
-			nodes[queryIdR] = new Node(queryIdR, false, true); 
+			nodes[queryId] = new Node(queryId, false, false, queryTuple);
+			nodes[queryIdR] = new Node(queryIdR, false, true, queryTuple); 
 		}
 		if (nodes.find(targetId) == nodes.end()) {
-			nodes[targetId] = new Node(targetId, true, false);
+			nodes[targetId] = new Node(targetId, true, false, targetTuple);
 			contigs.push_back(nodes[targetId]);
 
-			nodes[targetIdR] = new Node(targetIdR, true, true);
+			nodes[targetIdR] = new Node(targetIdR, true, true, targetTuple);
 			contigsReversed.push_back(nodes[targetIdR]);
 		}
 		/*
@@ -375,18 +503,20 @@ int main(int argc, char* argv[]){
         int overlapScore = get<2>(overlap);
         string sign = get<3>(overlap);
 		string direction = get<4>(overlap);
+		tuple<int,int,int> queryTuple = get<5>(overlap);
+		tuple<int,int,int> targetTuple = get<6>(overlap);
 
 		string queryIdR = queryId + "*";
 		string targetIdR = targetId + "*";
 
 		//Set nodes
 		if (nodes.find(queryId) == nodes.end()) {
-			nodes[queryId] = new Node(queryId, false, false);
-			nodes[queryIdR] = new Node(queryIdR, false, true); 
+			nodes[queryId] = new Node(queryId, false, false, queryTuple);
+			nodes[queryIdR] = new Node(queryIdR, false, true, queryTuple); 
 		}
 		if (nodes.find(targetId) == nodes.end()) {
-			nodes[targetId] = new Node(targetId, false, false);
-			nodes[targetIdR] = new Node(targetIdR, false, true);
+			nodes[targetId] = new Node(targetId, false, false, targetTuple);
+			nodes[targetIdR] = new Node(targetIdR, false, true, targetTuple);
 		}
 
 	
@@ -462,8 +592,8 @@ int main(int argc, char* argv[]){
 	std::sort(contigs.begin(), contigs.end(), compareNodes);
 
 	
-	//vector<vector<Node*> > nodePaths = constructPaths(first, flagMonteCarlo, contigs);
-	vector<vector<Node*> > nodePaths = constructPaths(firstR, flagMonteCarlo, contigsReversed);
+	vector<vector<Node*> > nodePaths = constructPaths(first, flagMonteCarlo, contigs);
+	//vector<vector<Node*> > nodePaths = constructPaths(firstR, flagMonteCarlo, contigsReversed);
 	std::cout << "tu sam" << endl;
 	paths.insert(paths.end(), nodePaths.begin(), nodePaths.end());
 	
@@ -476,6 +606,26 @@ int main(int argc, char* argv[]){
 		std::cout << endl;
 		
 	}
+	
+	//parse reads and contigs to map(name:sequence)
+	map<string,string> contigsMap = parseFastaToMap("ecoli_test_contigs.fasta");
+	map<string,string> readsMap = parseFastaToMap("ecoli_test_reads.fasta");
+	
+	string finalSequence = makeSequenceFromPath( paths, contigsMap, readsMap);
+	
+	string output_file = "output.fasta";
+	
+	ofstream outputFile(output_file);
+
+	//write sequence in file
+    if (outputFile.is_open()) {
+		outputFile << ">NC_000913.3 Escherichia coli str. K-12 substr. MG1655, complete genome\n";
+        outputFile << finalSequence;
+        outputFile.close();
+        std::cout << "String written to file." << std::endl;
+    } else {
+        std::cerr << "Failed to open the file." << std::endl;
+    }
 	
 	for(const auto& node : nodes) {
 		delete node.second;

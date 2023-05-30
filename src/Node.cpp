@@ -2,10 +2,11 @@
 #include <tuple>
 using namespace std;
 
-Node::Node(const string& identifier, bool isAnchoringNode, bool isReverse) {
+Node::Node(const string& identifier, bool isAnchoringNode, bool isReverse, tuple<int,int,int> seqTuple) {
 	this->identifier = identifier;
 	this->isAnchoringNode = isAnchoringNode;
 	this->isReverse = isReverse;
+	this->seqTuple = seqTuple;
 }
 
 void Node::addChild(Node* child, int overlapScore) {
