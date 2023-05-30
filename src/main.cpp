@@ -143,7 +143,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 			}
 			
 			
-			if (bestChild->isAnchoringNode && contigs[0]->identifier == bestChild->identifier) {
+			if (bestChild->isAnchoringNode && (contigs[0]->identifier == bestChild->identifier || contigs[0]->identifier + "*" == bestChild->identifier)) {
 				//std::cout << bestChild->identifier << endl;
 				currentPath.push_back(bestChild);
 				paths.push_back(currentPath);
@@ -156,7 +156,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 				currentPath.push_back(bestChild); 
 				forRemove.clear();
 				//return paths;
-			}else if(bestChild->isAnchoringNode && contigs[0]->identifier != bestChild->identifier){
+			}else if(bestChild->isAnchoringNode && contigs[0]->identifier != bestChild->identifier && contigs[0]->identifier + "*" == bestChild->identifier){
 				forRemove[currentNode->identifier].push_back(bestChild);
 				
 			}
