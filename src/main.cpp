@@ -12,6 +12,12 @@
 
 using namespace std;
 
+bool compareNodes(const Node* node1, const Node* node2) {
+    return node1->identifier < node2->identifier;
+}
+bool compareNodesReversed(const Node* node1, const Node* node2) {
+    return node1->identifier > node2->identifier;
+}
 bool comparePairs(const tuple<Node*, int>& a, const tuple<Node*, int>& b) {
 	return get<1>(a) > get<1>(b);
 }
@@ -36,9 +42,11 @@ size_t monteCarloSelection(const vector<double>& weights) {
 }
 
 //without recursion
-vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo) {
+vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vector<Node*> contigs) {
     vector<vector<Node*> > paths;
     vector<Node*> currentPath;
+	
+	unordered_map<string, vector<Node*>> forRemove;
     currentPath.push_back(startNode);
 
     while (!currentPath.empty()) {
@@ -52,7 +60,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo) {
 				Node* oldCurrentNode = currentPath.back();
         		const vector<tuple<Node*, int> >& oldChildren = oldCurrentNode->children;
 				vector<tuple<Node*, int> > oldSortedChildren(oldChildren);
-            	sort(oldSortedChildren.begin(), oldSortedChildren.end(), comparePairs);
+            	std::sort(oldSortedChildren.begin(), oldSortedChildren.end(), comparePairs);
 				if (!oldSortedChildren.empty()) {
 					Node* bestChildE = get<0>(oldSortedChildren[0]);
             		
@@ -66,14 +74,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo) {
 					if (index != -1) {
 						oldCurrentNode->deleteChild(index);
 					}
-					/*
-					Node* bestChildE = oldSortedChildren[0].first;
-					cout << "ovdje" <<endl;
-					cout << bestChildE->identifier<<endl;
-					//std::pair<Node*, int> toErase = oldSortedChildren[0];
-					oldCurrentNode->deleteChild(oldSortedChildren.begin());
-					//oldChildren.erase(oldSortedChildren.begin());
-					*/
+					
 				}
 			}
 
@@ -95,54 +96,77 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo) {
 				
 			} else {
 				sortedChildren = children;
-				sort(sortedChildren.begin(), sortedChildren.end(), comparePairs);
+				if (forRemove[currentNode->identifier].size() != 0){
+					vector<tuple<Node*, int>> newSortedChildren;
+					for (const auto& t : sortedChildren) {
+						if (std::find_if(forRemove[currentNode->identifier].begin(), forRemove[currentNode->identifier].end(), [&](Node* node) {
+        								return std::get<0>(t)->identifier == node->identifier;
+    									}) == forRemove[currentNode->identifier].end()) {
+							newSortedChildren.push_back(t);
+						}
+					}
+					sortedChildren = newSortedChildren;
+					
+				}
+				if(sortedChildren.size() != 0){
+					std::sort(sortedChildren.begin(), sortedChildren.end(), comparePairs);
+				}
+				
 			}
-				
-			Node* bestChild = get<0>(sortedChildren[0]); // Initialize with the first child
-
-			while (!sortedChildren.empty()) {
-				
-				bestChild = get<0>(sortedChildren[0]);
-				// Check if the best child is already in the current path
-				bool childExistsInPath = false;
-				for (Node* node : currentPath) {
-					if (node == bestChild) {
-						childExistsInPath = true;
-						sortedChildren.erase(sortedChildren.begin());
+			Node* emptyNode = new Node("", false, false);
+			Node* bestChild = emptyNode;
+			if(sortedChildren.size() != 0){
+				bestChild = get<0>(sortedChildren[0]); // Initialize with the first child
+				while (!sortedChildren.empty()) {
+					
+					bestChild = get<0>(sortedChildren[0]);
+					//std::cout << bestChild->identifier<< "  kod brisanja"<<endl;
+					// Check if the best child is already in the current path
+					bool childExistsInPath = false;
+					for (Node* node : currentPath) {
+						if (node == bestChild) {
+							childExistsInPath = true;
+							sortedChildren.erase(sortedChildren.begin());
+							if (sortedChildren.empty()) {
+								bestChild = emptyNode;
+							}
+							break;
+						}
+					
+					}
+					if (childExistsInPath == false) {
 						break;
 					}
-				
 				}
-				if (childExistsInPath == false) {
-					break;
-				}
-			
+				//std::cout << bestChild->identifier<< "  best2"<<endl;
 			}
-			// Check if the best child is already in the current path
-            /*bool childExistsInPath = false;
-            for (Node* node : currentPath) {
-                if (node == bestChild) {
-                    childExistsInPath = true;
-                    break;
-                }
-            }*/
-
-            /*if (childExistsInPath) {
-                paths.push_back(currentPath);
-                currentPath.pop_back();
-            } else {
-            currentPath.push_back(bestChild);
-            }*/
 			
-			if (bestChild->isAnchoringNode) {
+			
+			if (bestChild->isAnchoringNode && contigs[0]->identifier == bestChild->identifier) {
+				//std::cout << bestChild->identifier << endl;
 				currentPath.push_back(bestChild);
 				paths.push_back(currentPath);
-				return paths;
+				
+				contigs.erase(contigs.begin());
+				if (contigs.size() == 0){
+					return paths;
+				}
+				currentPath.clear();
+				currentPath.push_back(bestChild); 
+				forRemove.clear();
+				//return paths;
+			}else if(bestChild->isAnchoringNode && contigs[0]->identifier != bestChild->identifier){
+				forRemove[currentNode->identifier].push_back(bestChild);
+				
 			}
 			
-			if (sortedChildren.empty()) {
+			else if (sortedChildren.empty()) {
 				//paths.push_back(currentPath);
+				//moguci error
+				Node* r = currentPath.back();
 				currentPath.pop_back();
+				Node* curr = currentPath.back();
+				forRemove[curr->identifier].push_back(r);
 				
 			} else {
 				currentPath.push_back(bestChild);
@@ -283,8 +307,10 @@ int main(int argc, char* argv[]){
 	vector<tuple<string, string, int, string, string> > readReadOverlaps = readPAF(fileReads, scoreType);
 		
 	unordered_map<string, Node*> nodes;
+	vector<Node*> contigs;
+	vector<Node*> contigsReversed;
 	
-	cout << "before contig-read" << endl;
+	std::cout << "before contig-read" << endl;
 	//Going over contig-read overlaps
 	for (const auto& overlap : contigReadOverlaps) {
         string queryId = get<0>(overlap);
@@ -303,7 +329,10 @@ int main(int argc, char* argv[]){
 		}
 		if (nodes.find(targetId) == nodes.end()) {
 			nodes[targetId] = new Node(targetId, true, false);
+			contigs.push_back(nodes[targetId]);
+
 			nodes[targetIdR] = new Node(targetIdR, true, true);
+			contigsReversed.push_back(nodes[targetIdR]);
 		}
 		/*
 		if (sign == "-"){
@@ -338,7 +367,7 @@ int main(int argc, char* argv[]){
 		
     }
 	
-	cout << "before read-read" << endl;
+	std::cout << "before read-read" << endl;
 	//Going over read-read overlaps
 	for (const auto& overlap : readReadOverlaps) {
         string queryId = get<0>(overlap);
@@ -407,8 +436,9 @@ int main(int argc, char* argv[]){
 	//nodes["ctg2"]->addChild(nodes["read3"], 8);
 	
 	*/
-	cout << "before paths" << endl;
+	std::cout << "before paths" << endl;
 	vector<vector<Node*> > paths;
+	/*
 	for (const auto& node : nodes) {
 		if(node.second->isAnchoringNode) {
 			//cout << node.first<<endl;
@@ -419,16 +449,32 @@ int main(int argc, char* argv[]){
 				paths.insert(paths.end(), nodePaths.begin(), nodePaths.end());
 			}
 		}
-	}
+	} */
+	std::sort(contigsReversed.begin(), contigsReversed.end(), compareNodesReversed);
+	Node* firstR = contigsReversed[0];
+	std::cout << firstR->identifier << endl;
+	contigsReversed.erase(contigsReversed.begin());
+
+	Node* first = contigs[0];
+	std::cout << first->identifier << endl;
+	contigs.erase(contigs.begin());
+
+	std::sort(contigs.begin(), contigs.end(), compareNodes);
+
+	
+	//vector<vector<Node*> > nodePaths = constructPaths(first, flagMonteCarlo, contigs);
+	vector<vector<Node*> > nodePaths = constructPaths(firstR, flagMonteCarlo, contigsReversed);
+	std::cout << "tu sam" << endl;
+	paths.insert(paths.end(), nodePaths.begin(), nodePaths.end());
 	
 	//print paths
 	for(const auto& path : paths) {
 		for(const auto& node : path) {
-			cout << node->identifier << " ";
+			std::cout << node->identifier << " ";
 			//dodati ako je node kompl dodati *
 		}
-		cout << endl;
-		cout << endl;
+		std::cout << endl;
+		
 	}
 	
 	for(const auto& node : nodes) {
