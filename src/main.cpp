@@ -511,7 +511,7 @@ int main(int argc, char* argv[]){
 
         //Add child based on sign and direction
 		if (sign == "+") {
-			if (direction == "right") {
+			if (direction == "left") {
 				nodes[targetId]->seqTuple = targetTuple; 
 				nodes[queryIdR]->seqTuple = queryTuple;
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
@@ -523,7 +523,7 @@ int main(int argc, char* argv[]){
 				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore);
 			}
 		}else{
-			if (direction == "right") {
+			if (direction == "left") {
 				nodes[targetIdR]->seqTuple = targetTuple; 
 				nodes[queryIdR]->seqTuple = queryTuple;
 				nodes[targetId]->addChild(nodes[queryIdR], overlapScore);
@@ -572,7 +572,7 @@ int main(int argc, char* argv[]){
         //Add child
         //Add child based on sign and direction
 		if (sign == "+") {
-			if (direction == "right") {
+			if (direction == "left") {
 				nodes[targetId]->seqTuple = targetTuple; 
 				nodes[queryIdR]->seqTuple = queryTuple;
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
@@ -584,7 +584,7 @@ int main(int argc, char* argv[]){
 				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore);
 			}
 		}else{
-			if (direction == "right") {
+			if (direction == "left") {
 				nodes[targetIdR]->seqTuple = targetTuple; 
 				nodes[queryIdR]->seqTuple = queryTuple;
 				nodes[targetId]->addChild(nodes[queryIdR], overlapScore);
