@@ -422,6 +422,24 @@ string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> cont
 				}
 			}else{
 				//za reverzni
+				int new_end = length-1 - start;
+				if(node->isAnchoringNode){
+					
+					if (flagFirst){
+						finalSequence += reverseComplement(sequence);
+						flagFirst = false;
+					}else{
+						finalSequence.erase(finalSequence.length() - new_end);
+						finalSequence += reverseComplement(sequence);
+					}
+				}else {
+					string reversedSequence = reverseComplement(sequence);
+					//int new_end = length-1 - start;
+					//int new_start = length-1 - end;
+					int new_end2 = length-1-(get<1>(node->seqTuple2)-1);
+					//finalSequence += sequence.substr(end, length-end);
+					finalSequence += reversedSequence.substr(new_end, new_end2-new_end);
+				}
 			}
 			
 			//kao prije
