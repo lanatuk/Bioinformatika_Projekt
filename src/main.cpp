@@ -339,7 +339,7 @@ string reverseComplement(string sequence) {
 
 string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> contigsMap, map<string,string> readsMap) {
 	bool flagFirst = true;
-	string finalSequence;
+	string finalSequence = "";
 	vector<string> usedContigs;
  	for (const auto& path : paths) {
 		for (Node* node : path) {
@@ -364,16 +364,22 @@ string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> cont
 			}
 			
 			int start = get<0>(node->seqTuple);
-			int end = get<1>(node->seqTuple);
+			int end = get<1>(node->seqTuple)-1;
 			int length = get<2>(node->seqTuple);
 			
-			if (!node->isReverse) {
+			cout << nodeId << " ";
+			cout << start << " " << end << " " << length << endl;
+			
+			
+			//kao prije
+			/*
+			if (!node->isReverse or node->isAnchoringNode) {
 				//first sequence
 				if(flagFirst) {
-					finalSequence = sequence;
+					finalSequence += sequence;
 					flagFirst = false;
 				} else {
-					finalSequence += sequence.substr(end, length);
+					finalSequence += sequence.substr(end, length-end);
 				}
 			} else {
 				//first sequence
@@ -384,9 +390,36 @@ string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> cont
 					string reversedSequence = reverseComplement(sequence);
 					int new_end = length-1 - start;
 					int new_start = length-1 - end;
-					finalSequence += reversedSequence.substr(new_end, length);
+					//finalSequence += sequence.substr(end, length-end);
+					finalSequence += reversedSequence.substr(new_end, length-new_end);
 				}
 			}
+			*/
+			
+			//cijeli contizi
+			if(node->isAnchoringNode) {
+				if (flagFirst) {
+					flagFirst = false;
+				} else {
+					finalSequence = finalSequence.substr(0, finalSequence.length()-(end-start));
+				}
+				finalSequence += sequence;
+				
+			} else {
+				if (!node->isReverse) {
+					finalSequence += sequence.substr(end, length-end);
+
+				} else {
+				//first sequence
+					string reversedSequence = reverseComplement(sequence);
+					int new_end = length-1 - start;
+					int new_start = length-1 - end;
+					finalSequence += sequence.substr(end, length-end);
+					//finalSequence += reversedSequence.substr(new_end, length-new_end);
+				
+			}
+			
+		}
 		}
 		
 	}
@@ -452,14 +485,18 @@ int main(int argc, char* argv[]){
 
 		//Set nodes
 		if (nodes.find(queryId) == nodes.end()) {
-			nodes[queryId] = new Node(queryId, false, false, queryTuple);
-			nodes[queryIdR] = new Node(queryIdR, false, true, queryTuple); 
+			//nodes[queryId] = new Node(queryId, false, false, queryTuple);
+			//nodes[queryIdR] = new Node(queryIdR, false, true, queryTuple);
+			nodes[queryId] = new Node(queryId, false, false, make_tuple(0,0,0));
+			nodes[queryIdR] = new Node(queryIdR, false, true, make_tuple(0,0,0)); 			
 		}
 		if (nodes.find(targetId) == nodes.end()) {
-			nodes[targetId] = new Node(targetId, true, false, targetTuple);
+			nodes[targetId] = new Node(targetId, true, false, make_tuple(0,0,0));
+			nodes[targetIdR] = new Node(targetIdR, true, true, make_tuple(0,0,0));
+			//nodes[targetId] = new Node(targetId, true, false, targetTuple);
 			contigs.push_back(nodes[targetId]);
 
-			nodes[targetIdR] = new Node(targetIdR, true, true, targetTuple);
+			//nodes[targetIdR] = new Node(targetIdR, true, true, targetTuple);
 			contigsReversed.push_back(nodes[targetIdR]);
 		}
 		/*
@@ -475,17 +512,25 @@ int main(int argc, char* argv[]){
         //Add child based on sign and direction
 		if (sign == "+") {
 			if (direction == "right") {
+				nodes[targetId]->seqTuple = targetTuple; 
+				nodes[queryIdR]->seqTuple = queryTuple;
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
 				nodes[targetIdR]->addChild(nodes[queryIdR], overlapScore);
 			} else {
+				nodes[queryId]->seqTuple = queryTuple;
+				nodes[targetIdR]->seqTuple = targetTuple;
 				nodes[targetId]->addChild(nodes[queryId], overlapScore);
 				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore);
 			}
 		}else{
 			if (direction == "right") {
+				nodes[targetIdR]->seqTuple = targetTuple; 
+				nodes[queryIdR]->seqTuple = queryTuple;
 				nodes[targetId]->addChild(nodes[queryIdR], overlapScore);
 				nodes[queryId]->addChild(nodes[targetIdR], overlapScore);
 			} else {
+				nodes[targetId]->seqTuple = targetTuple; 
+				nodes[queryId]->seqTuple = queryTuple;
 				nodes[targetIdR]->addChild(nodes[queryId], overlapScore);
 				nodes[queryIdR]->addChild(nodes[targetId], overlapScore);
 			}
@@ -511,12 +556,16 @@ int main(int argc, char* argv[]){
 
 		//Set nodes
 		if (nodes.find(queryId) == nodes.end()) {
-			nodes[queryId] = new Node(queryId, false, false, queryTuple);
-			nodes[queryIdR] = new Node(queryIdR, false, true, queryTuple); 
+			//nodes[queryId] = new Node(queryId, false, false, queryTuple);
+			//nodes[queryIdR] = new Node(queryIdR, false, true, queryTuple); 
+			nodes[queryId] = new Node(queryId, false, false, make_tuple(0,0,0));
+			nodes[queryIdR] = new Node(queryIdR, false, true, make_tuple(0,0,0)); 
 		}
 		if (nodes.find(targetId) == nodes.end()) {
-			nodes[targetId] = new Node(targetId, false, false, targetTuple);
-			nodes[targetIdR] = new Node(targetIdR, false, true, targetTuple);
+			//nodes[targetId] = new Node(targetId, false, false, targetTuple);
+			//nodes[targetIdR] = new Node(targetIdR, false, true, targetTuple);
+			nodes[targetId] = new Node(targetId, false, false, make_tuple(0,0,0));
+			nodes[targetIdR] = new Node(targetIdR, false, true, make_tuple(0,0,0));
 		}
 
 	
@@ -524,17 +573,25 @@ int main(int argc, char* argv[]){
         //Add child based on sign and direction
 		if (sign == "+") {
 			if (direction == "right") {
+				nodes[targetId]->seqTuple = targetTuple; 
+				nodes[queryIdR]->seqTuple = queryTuple;
 				nodes[queryId]->addChild(nodes[targetId], overlapScore);
 				nodes[targetIdR]->addChild(nodes[queryIdR], overlapScore);
 			} else {
+				nodes[queryId]->seqTuple = queryTuple;
+				nodes[targetIdR]->seqTuple = targetTuple;
 				nodes[targetId]->addChild(nodes[queryId], overlapScore);
 				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore);
 			}
 		}else{
 			if (direction == "right") {
+				nodes[targetIdR]->seqTuple = targetTuple; 
+				nodes[queryIdR]->seqTuple = queryTuple;
 				nodes[targetId]->addChild(nodes[queryIdR], overlapScore);
 				nodes[queryId]->addChild(nodes[targetIdR], overlapScore);
 			} else {
+				nodes[targetId]->seqTuple = targetTuple; 
+				nodes[queryId]->seqTuple = queryTuple;
 				nodes[targetIdR]->addChild(nodes[queryId], overlapScore);
 				nodes[queryIdR]->addChild(nodes[targetId], overlapScore);
 			}
