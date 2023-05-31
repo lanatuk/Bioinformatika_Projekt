@@ -81,21 +81,39 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 
         } else {
 			vector<tuple<Node*, int, tuple<int, int, int>, tuple<int, int, int>>> sortedChildren;
+			vector<tuple<Node*, int, tuple<int, int, int>, tuple<int, int, int>>> childrenForSort = children;
+
+			if (forRemove[currentNode->identifier].size() != 0){
+					vector<tuple<Node*, int, tuple<int, int, int>, tuple<int, int, int>>> newSortedChildren;
+					for (const auto& t : childrenForSort) {
+						if (std::find_if(forRemove[currentNode->identifier].begin(), forRemove[currentNode->identifier].end(), [&](Node* node) {
+        								return std::get<0>(t)->identifier == node->identifier;
+    									}) == forRemove[currentNode->identifier].end()) {
+							newSortedChildren.push_back(t);
+						}
+					}
+					childrenForSort = newSortedChildren;
+					
+			}
 			
 			if (flagMonteCarlo) {
-				vector<double> weights;
-				for (const auto& child : children) {
-					weights.push_back(get<1>(child));
-				}
-				
-				//set<int> usedIndexes;
-				for (int i = 0; i < children.size(); i++) {
-					size_t selectedIndex = monteCarloSelection(weights);
-					sortedChildren.push_back(children[selectedIndex]);
-					weights.erase(weights.begin() + int(selectedIndex));
+				if(childrenForSort.size() != 0){
+					vector<double> weights;
+					for (const auto& child : childrenForSort) {
+						weights.push_back(get<1>(child));
+					}
+					
+					//set<int> usedIndexes;
+					for (int i = 0; i < childrenForSort.size(); i++) {
+						size_t selectedIndex = monteCarloSelection(weights);
+						sortedChildren.push_back(children[selectedIndex]);
+						weights.erase(weights.begin() + int(selectedIndex));
+					}
 				}
 				
 			} else {
+				sortedChildren = childrenForSort;
+				/*
 				sortedChildren = children;
 				if (forRemove[currentNode->identifier].size() != 0){
 					vector<tuple<Node*, int, tuple<int, int, int>, tuple<int, int, int>>> newSortedChildren;
@@ -108,7 +126,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 					}
 					sortedChildren = newSortedChildren;
 					
-				}
+				}*/
 				if(sortedChildren.size() != 0){
 					std::sort(sortedChildren.begin(), sortedChildren.end(), comparePairs);
 				}
@@ -180,7 +198,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 				currentPath.push_back(bestChild); 
 				forRemove.clear();
 				//return paths;
-			}else if(bestChild->isAnchoringNode && contigs[0]->identifier != bestChild->identifier && contigs[0]->identifier + "*" == bestChild->identifier){
+			}else if(bestChild->isAnchoringNode && contigs[0]->identifier != bestChild->identifier && contigs[0]->identifier + "*" != bestChild->identifier){
 				forRemove[currentNode->identifier].push_back(bestChild);
 				
 			}
@@ -394,8 +412,8 @@ string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> cont
 			int end = get<1>(node->seqTuple)-1;
 			int length = get<2>(node->seqTuple);
 			
-			cout << nodeId << " ";
-			cout << start << " " << end << " " << length << endl;
+			std::cout << nodeId << " ";
+			std::cout << start << " " << end << " " << length << endl;
 
 			if (!node->isReverse) {
 				if(node->isAnchoringNode){
