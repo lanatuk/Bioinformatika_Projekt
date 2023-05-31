@@ -154,9 +154,10 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 				Node* parent = currentPath.back();
 				currentPath.push_back(bestChild);
 				bestChild->seqTuple = overlap;
-				tuple<int, int, int> parentPast = parent->seqTuple;
+				//tuple<int, int, int> parentPast = parent->seqTuple;
+				parent->seqTuple2 = overlapParent;
 
-				
+				/*
 				if(get<0>(overlapParent)- get<0>(overlap) < get<1>(parentPast)){
 					tuple<int, int, int> ov = make_tuple(get<0>(parentPast), get<0>(overlapParent)- get<0>(overlap), get<2>(parentPast));
 					parent->seqTuple = ov;
@@ -167,7 +168,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 					
 				}else{
 					parent->seqTuple2 = overlapParent;
-				}
+				}*/
 
 				paths.push_back(currentPath);
 				
@@ -398,17 +399,26 @@ string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> cont
 
 			if (!node->isReverse) {
 				if(node->isAnchoringNode){
-					finalSequence += sequence;
+					if (flagFirst){
+						finalSequence += sequence;
+						flagFirst = false;
+					}else{
+						finalSequence.erase(finalSequence.length() - end);
+						finalSequence += sequence;
+					}
 				}else{
+					finalSequence += sequence.substr(end, (get<1>(node->seqTuple2)-1)-end);
+					/*
 					if (get<0>(node->seqTuple2) < 0){
 						finalSequence.erase(finalSequence.length() + get<0>(node->seqTuple2));
 					}else{
 						if (get<0>(node->seqTuple2) < end){
+							//samo ovo ostaviti
 							finalSequence += sequence.substr(end, get<1>(node->seqTuple2)-end);
 						}else{
 							finalSequence += sequence.substr(end, get<0>(node->seqTuple2)-end);
 						}
-					}
+					}*/
 				}
 			}else{
 				//za reverzni
