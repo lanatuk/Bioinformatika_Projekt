@@ -19,7 +19,7 @@ bool compareNodes(const Node* node1, const Node* node2) {
 bool compareNodesReversed(const Node* node1, const Node* node2) {
     return node1->identifier > node2->identifier;
 }
-bool comparePairs(const tuple<Node*, int>& a, const tuple<Node*, int>& b) {
+bool comparePairs(const tuple<Node*, int, tuple<int, int, int>>& a, const tuple<Node*, int, tuple<int, int, int>>& b) {
 	return get<1>(a) > get<1>(b);
 }
 
@@ -52,15 +52,15 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 
     while (!currentPath.empty()) {
         Node* currentNode = currentPath.back();
-        const vector<tuple<Node*, int> >& children = currentNode->children;
+        const vector<tuple<Node*, int, tuple<int, int, int>> >& children = currentNode->children;
 
         if (children.empty()) {
             //paths.push_back(currentPath);
             currentPath.pop_back();
 			if(!currentPath.empty()){
 				Node* oldCurrentNode = currentPath.back();
-        		const vector<tuple<Node*, int> >& oldChildren = oldCurrentNode->children;
-				vector<tuple<Node*, int> > oldSortedChildren(oldChildren);
+        		const vector<tuple<Node*, int, tuple<int, int, int>> >& oldChildren = oldCurrentNode->children;
+				vector<tuple<Node*, int, tuple<int, int, int>> > oldSortedChildren(oldChildren);
             	std::sort(oldSortedChildren.begin(), oldSortedChildren.end(), comparePairs);
 				if (!oldSortedChildren.empty()) {
 					Node* bestChildE = get<0>(oldSortedChildren[0]);
@@ -80,7 +80,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 			}
 
         } else {
-			vector<tuple<Node*, int>> sortedChildren;
+			vector<tuple<Node*, int, tuple<int, int, int>>> sortedChildren;
 			
 			if (flagMonteCarlo) {
 				vector<double> weights;
@@ -98,7 +98,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 			} else {
 				sortedChildren = children;
 				if (forRemove[currentNode->identifier].size() != 0){
-					vector<tuple<Node*, int>> newSortedChildren;
+					vector<tuple<Node*, int, tuple<int, int, int>>> newSortedChildren;
 					for (const auto& t : sortedChildren) {
 						if (std::find_if(forRemove[currentNode->identifier].begin(), forRemove[currentNode->identifier].end(), [&](Node* node) {
         								return std::get<0>(t)->identifier == node->identifier;
@@ -116,11 +116,14 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 			}
 			Node* emptyNode = new Node("", false, false, make_tuple(0,0,0));
 			Node* bestChild = emptyNode;
+			tuple<int, int, int> overlap;
 			if(sortedChildren.size() != 0){
 				bestChild = get<0>(sortedChildren[0]); // Initialize with the first child
+				overlap = get<2>(sortedChildren[0]);
 				while (!sortedChildren.empty()) {
 					
 					bestChild = get<0>(sortedChildren[0]);
+					overlap = get<2>(sortedChildren[0]);
 					//std::cout << bestChild->identifier<< "  kod brisanja"<<endl;
 					// Check if the best child is already in the current path
 					bool childExistsInPath = false;
@@ -146,6 +149,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 			if (bestChild->isAnchoringNode && (contigs[0]->identifier == bestChild->identifier || contigs[0]->identifier + "*" == bestChild->identifier)) {
 				//std::cout << bestChild->identifier << endl;
 				currentPath.push_back(bestChild);
+				bestChild->seqTuple = overlap;
 				paths.push_back(currentPath);
 				
 				contigs.erase(contigs.begin());
@@ -171,6 +175,7 @@ vector<vector<Node*> > constructPaths(Node* startNode, bool flagMonteCarlo, vect
 				
 			} else {
 				currentPath.push_back(bestChild);
+				bestChild->seqTuple = overlap; 
             }
         }
     }
@@ -512,27 +517,27 @@ int main(int argc, char* argv[]){
         //Add child based on sign and direction
 		if (sign == "+") {
 			if (direction == "left") {
-				nodes[targetId]->seqTuple = targetTuple; 
-				nodes[queryIdR]->seqTuple = queryTuple;
-				nodes[queryId]->addChild(nodes[targetId], overlapScore);
-				nodes[targetIdR]->addChild(nodes[queryIdR], overlapScore);
+				//nodes[targetId]->seqTuple = targetTuple; 
+				//nodes[queryIdR]->seqTuple = queryTuple;
+				nodes[queryId]->addChild(nodes[targetId], overlapScore, targetTuple);
+				nodes[targetIdR]->addChild(nodes[queryIdR], overlapScore, queryTuple);
 			} else {
-				nodes[queryId]->seqTuple = queryTuple;
-				nodes[targetIdR]->seqTuple = targetTuple;
-				nodes[targetId]->addChild(nodes[queryId], overlapScore);
-				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore);
+				//nodes[queryId]->seqTuple = queryTuple;
+				//nodes[targetIdR]->seqTuple = targetTuple;
+				nodes[targetId]->addChild(nodes[queryId], overlapScore, queryTuple);
+				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore, targetTuple);
 			}
 		}else{
 			if (direction == "left") {
-				nodes[targetIdR]->seqTuple = targetTuple; 
-				nodes[queryIdR]->seqTuple = queryTuple;
-				nodes[targetId]->addChild(nodes[queryIdR], overlapScore);
-				nodes[queryId]->addChild(nodes[targetIdR], overlapScore);
+				//nodes[targetIdR]->seqTuple = targetTuple; 
+				//nodes[queryIdR]->seqTuple = queryTuple;
+				nodes[targetId]->addChild(nodes[queryIdR], overlapScore, queryTuple);
+				nodes[queryId]->addChild(nodes[targetIdR], overlapScore, targetTuple);
 			} else {
-				nodes[targetId]->seqTuple = targetTuple; 
-				nodes[queryId]->seqTuple = queryTuple;
-				nodes[targetIdR]->addChild(nodes[queryId], overlapScore);
-				nodes[queryIdR]->addChild(nodes[targetId], overlapScore);
+				//nodes[targetId]->seqTuple = targetTuple; 
+				//nodes[queryId]->seqTuple = queryTuple;
+				nodes[targetIdR]->addChild(nodes[queryId], overlapScore, queryTuple);
+				nodes[queryIdR]->addChild(nodes[targetId], overlapScore, targetTuple);
 			}
 		}
         //dodati za reverzni komplement
@@ -573,27 +578,27 @@ int main(int argc, char* argv[]){
         //Add child based on sign and direction
 		if (sign == "+") {
 			if (direction == "left") {
-				nodes[targetId]->seqTuple = targetTuple; 
-				nodes[queryIdR]->seqTuple = queryTuple;
-				nodes[queryId]->addChild(nodes[targetId], overlapScore);
-				nodes[targetIdR]->addChild(nodes[queryIdR], overlapScore);
+				//nodes[targetId]->seqTuple = targetTuple; 
+				//nodes[queryIdR]->seqTuple = queryTuple;
+				nodes[queryId]->addChild(nodes[targetId], overlapScore, targetTuple);
+				nodes[targetIdR]->addChild(nodes[queryIdR], overlapScore, queryTuple);
 			} else {
-				nodes[queryId]->seqTuple = queryTuple;
-				nodes[targetIdR]->seqTuple = targetTuple;
-				nodes[targetId]->addChild(nodes[queryId], overlapScore);
-				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore);
+				//nodes[queryId]->seqTuple = queryTuple;
+				//nodes[targetIdR]->seqTuple = targetTuple;
+				nodes[targetId]->addChild(nodes[queryId], overlapScore, queryTuple);
+				nodes[queryIdR]->addChild(nodes[targetIdR], overlapScore, targetTuple);
 			}
 		}else{
 			if (direction == "left") {
-				nodes[targetIdR]->seqTuple = targetTuple; 
-				nodes[queryIdR]->seqTuple = queryTuple;
-				nodes[targetId]->addChild(nodes[queryIdR], overlapScore);
-				nodes[queryId]->addChild(nodes[targetIdR], overlapScore);
+				//nodes[targetIdR]->seqTuple = targetTuple; 
+				//nodes[queryIdR]->seqTuple = queryTuple;
+				nodes[targetId]->addChild(nodes[queryIdR], overlapScore, queryTuple);
+				nodes[queryId]->addChild(nodes[targetIdR], overlapScore, targetTuple);
 			} else {
-				nodes[targetId]->seqTuple = targetTuple; 
-				nodes[queryId]->seqTuple = queryTuple;
-				nodes[targetIdR]->addChild(nodes[queryId], overlapScore);
-				nodes[queryIdR]->addChild(nodes[targetId], overlapScore);
+				//nodes[targetId]->seqTuple = targetTuple; 
+				//nodes[queryId]->seqTuple = queryTuple;
+				nodes[targetIdR]->addChild(nodes[queryId], overlapScore, queryTuple);
+				nodes[queryIdR]->addChild(nodes[targetId], overlapScore, targetTuple);
 			}
 		}
 		//dodati za reverzni komplement
