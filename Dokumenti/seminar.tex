@@ -2,6 +2,8 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 
 \begin{document}
 
@@ -56,9 +58,53 @@ Na slici \ref{fig:scores} prikazano je kako se računa \textit{overlap score} i 
 \end{itemize}
 \end{flushleft}
 
+\newpage
+\section{Koraci algoritma}
+\subsubsection{Korak 1: Konstrukcija grafa preklapanja}
+Konstruirati graf preklapanja koji će povezati fragmentirane contige i očitanja
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{graph.png}
+  \caption{Primjer grafa preklapanja}
+  \label{fig:graph}
+\end{figure}
+
+\subsubsection{Korak 2: Identifikacija usidrenih čvorova}
+Identificirati usidrene čvorove u grafu preklapanja.
+
+\subsubsection{Korak 3: Pronalaženje optimalnih staza}
+Pronaći optimalne staze iz svakog usidrenog čvora do mogućih završnih usidrenih čvorova. Ove staze određuju kako će se fragmentirani contigi povezivati međusobno.
+\newline
+(ctg1 -> read1-> read5 -> ctg2)
+
+\subsubsection{Korak 4: Povezivanje contiga}
+Na temelju optimalnih staza, povezati fragmentirane contige u cijeli genom. Koristititi informacije o preklapanju i veze između contig-a i očitanja i očitanja i očitanja kako bismo dobili ispravno generirani genom.
+
+\chapter{Rezultati testiranja}
+Analiziramo vrijeme izvođenja algoritma i količinu zauzete memorije.
+\section{Vrijeme izvođenja}
+Konstruiranje grafa na temelju:
+\begin{itemize}
+    \item[•]{overlap score: 1.415 milliseconds}
+    \item[•]{extension score: 1.721 milliseconds}
+    \item[•]{MonteCarlo metoda: 1.515 milliseconds}
+\end{itemize}
+
+\section{Količina zauzete memorije}
+Konstruiranje grafa na temelju:
+\begin{itemize}
+    \item[•]{overlap score: 475.621 MB}
+    \item[•]{extension score: 478.988 MB}
+    \item[•]{MonteCarlo metoda: 476.492 MB}
+\end{itemize}
 
 \chapter{Zaključak}
-Zaključak.
+Napravili smo algoritam za poboljšanje djelomično sastavljenog genoma dugim očitanjima. Korištenjem grafa preklapanja i traženjem optimalnih staza, uspjeli smo povezati fragmentirane contige u cijeli genom. Naš algoritam koristi preklapanja dobivena alatom Minimap2 kao ulazne podatke i generira poboljšani skup sastavljenih contiga u FASTA formatu kao izlaz.
+\newline
+\\Testiranjem algoritma, proučavali smo vrijeme izvođenja i količinu zauzete memorije. Rezultati su pokazali da je naš algoritam učinkovit i može se primijeniti na velike skupove podataka s minimalnim resursnim zahtjevima.
+\newline
+\\Zaključno, naš algoritam za poboljšanje djelomično sastavljenog genoma dugim očitanjima pokazao se kao koristan alat u području bioinformatike. Daljnjom primjenom i nadogradnjom ovog algoritma možemo pridonijeti rješavanju problema sastavljanja genoma i razumijevanju složenih genomskih struktura.
 
 \bibliography{literatura}
 \bibliographystyle{fer}
