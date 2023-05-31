@@ -9,8 +9,8 @@ Node::Node(const string& identifier, bool isAnchoringNode, bool isReverse, tuple
 	this->seqTuple = seqTuple;
 }
 
-void Node::addChild(Node* child, int overlapScore) {
-	children.push_back(std::make_tuple(child, overlapScore));
+void Node::addChild(Node* child, int overlapScore, tuple<int, int, int> overlap) {
+	children.push_back(std::make_tuple(child, overlapScore, overlap));
 	//children.emplace_back(child, overlapScore);  //moguci error zbog vector, pair
 }
 void Node::deleteChild(int index) {
