@@ -356,7 +356,7 @@ string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> cont
 					//if contig already in vector
 					continue;
 				} else {
-					usedContigs.push_back(node->identifier);
+					usedContigs.push_back(nodeId);
 				}
 				sequence = contigsMap[nodeId];
 			} else {
@@ -384,7 +384,7 @@ string makeSequenceFromPath(vector<vector<Node*>> paths, map<string,string> cont
 					string reversedSequence = reverseComplement(sequence);
 					int new_end = length-1 - start;
 					int new_start = length-1 - end;
-					finalSequence += reversedSequence.substr(new_start, new_end);
+					finalSequence += reversedSequence.substr(new_end, length);
 				}
 			}
 		}
