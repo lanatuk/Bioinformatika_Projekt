@@ -14,7 +14,7 @@ optimalna staza će nam služiti da povežemo dva contig-a.
 **Izlazni podaci:**
 - Poboljšani skup sastavljenih contiga u FASTA formatu
 
-Skupovi očitanja i već sastavljenih contiga bit su pripremljeni kao testni podaci. Preklapanja treba dobiti 
+Skupovi očitanja i već sastavljenih contiga su pripremljeni kao testni podaci. Preklapanja treba dobiti 
 pomoću alata Minimap2 (https://github.com/lh3/minimap2), koristeći opciju:
 ```bash
    ./minimap2 -x ava-pb contigs.fasta reads.fasta > overlaps1.paf
@@ -37,10 +37,13 @@ Program ima opcije mijenjanja uvjeta prema kojem stvaramo graf, za overlap score
 ``` 
 
 
-## Izlazni podaci i evaluacija:
+## Izlazni podaci i evaluacija
 
 Poboljšani skup sastavljenih contiga će biti spremljen u datoteci **output.fasta**. Testiranje na sintetskim podacima i usporedba s referencom moguća je pomoću alata Gepard koji je dostupan na
 http://cube.univie.ac.at/gepard.
+
+## Podaci
+Unutar git repozitorija se nalazi mapa **data** u kojoj su 2 PAF datoteke, **contigs_reads.paf** i **reads_reads.paf** koje su već dobivene pomoću alata Minimap2 na kojima se može testirati program.
 
 
  
